@@ -13,6 +13,8 @@ namespace AnsPi
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+                    fonts.AddFont("MaterialIcons-Regular.ttf", "MaterialIcons");
+                    fonts.AddFont("SymbolsNerdFont-Regular.ttf", "NerdIcons");
                 });
 
 #if DEBUG
