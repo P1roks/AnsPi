@@ -1,5 +1,4 @@
 ﻿using CommunityToolkit.Mvvm.Input;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Windows.Input;
 
@@ -7,10 +6,8 @@ namespace AnsPi.ViewModels
 {
     public class ClassViewModel : IQueryAttributable
     {
-        public ObservableCollection<Models.Student> Students { get; private set; } = new();
-        private ulong[] lastRolled = new ulong[3] { 0, 0, 0 };
-        private uint luckyNumber = 0;
-        private string selectedClass = "";
+        public Models.StudentsHandler Students { get; private set; } = new();
+        private uint luckyNumber = Utils.GetLuckyNumber();
 
         public ICommand ChangeClassCommand { get; set; }
         public ICommand AddClassCommand { get; set; }
@@ -28,7 +25,7 @@ namespace AnsPi.ViewModels
 
         private async Task<bool> CheckClass()
         {
-            if(Students.Count == 0)
+            if(Students.className == null)
             {
                 await Shell.Current.DisplayAlert("Message", "Please select a class first!", "OK");
                 return false;
@@ -38,16 +35,11 @@ namespace AnsPi.ViewModels
 
         private async Task ChangeClass()
         {
-            string[] classes = Storage.GetClasses();
+            string[] classes = Models.StudentsHandler.GetClasses();
             string selected = await Shell.Current.DisplayActionSheet("Choose class", "Cancel", null, classes);
-            if(string.IsNullOrEmpty(selected)) return;
-            selectedClass = selected;
+            if(string.IsNullOrEmpty(selected) || selected == "Cancel") return;
 
-            Students.Clear();
-            foreach(var student in Storage.GetStudents(selected))
-            {
-                Students.Add(student);
-            }
+            Students.ChangeClass(selected);
         }
 
         private async Task AddClass()
@@ -55,8 +47,14 @@ namespace AnsPi.ViewModels
             string className = await Shell.Current.DisplayPromptAsync("Add Class", "Enter new class name: ");
             if(!string.IsNullOrWhiteSpace(className) && className.IndexOfAny(Path.GetInvalidFileNameChars()) < 0)
             {
-                Storage.AddClass(className);
-                await Shell.Current.GoToAsync(nameof(Views.EditClassPage));
+                if(!Students.ChangeClass(className))
+                {
+                    await Shell.Current.GoToAsync(nameof(Views.EditClassPage));
+                }
+                else
+                {
+                    await Shell.Current.DisplayAlert("Message", "Provided class already exists! Switching to it", "OK");
+                }
             }
         }
 
@@ -73,54 +71,44 @@ namespace AnsPi.ViewModels
         private async Task ChangeLuckyNumber()
         {
             if (!await CheckClass()) return;
+            Students[0].Present = false;
 
             string newLucky =
                 await Shell.Current.DisplayPromptAsync("Lucky Number", $"Current Lucky Number is: {luckyNumber}", "OK", "Random");
 
             if(newLucky == null)
             {
-                int numberIdx = new Random().Next(Students.Count);
-                luckyNumber = Students[numberIdx].Number;
+                luckyNumber = Students.GetRandomStudentNumber();
             }
             else if(newLucky.Length != 0)
             {
                 luckyNumber = uint.TryParse(newLucky, out var lucky) ? lucky : luckyNumber;
             }
+
+            Utils.SetLuckyNumber(luckyNumber);
         }
 
         private async Task RollStudent()
         {
             if (!await CheckClass()) return;
 
-            Trace.WriteLine(Students[0].GetHashCode());
-
-            var valid = Students.Where
-                (student => student.Number != luckyNumber &&
-                student.Present && !lastRolled.Contains(student.GetDeterministicHashCode()));
-            int chosen = new Random().Next(valid.Count());
-            var chosenStudent = valid.ElementAt(chosen);
-
-            await Shell.Current.DisplayAlert("Roll", $"{chosenStudent} has been selected for answer!", "OK");
-            UpdateLastRolled(chosenStudent.GetDeterministicHashCode());
-        }
-
-        private void UpdateLastRolled(ulong inserted)
-        {
-            lastRolled[0] = lastRolled[1];
-            lastRolled[1] = lastRolled[2];
-            lastRolled[2] = inserted;
+            try
+            {
+                var chosen = Students.RollStudent(luckyNumber);
+                await Shell.Current.DisplayAlert("Roll", $"{chosen.FullName} has been selected for answer!", "OK");
+            }
+            catch
+            {
+                await Shell.Current.DisplayAlert("Roll", "No student can be selected!", "OK");
+            }
         }
 
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
             if(query.ContainsKey("students"))
             {
-                Students.Clear();
-                var students = (IEnumerable<Models.Student>)query["students"];
-                foreach(var student in students)
-                {
-                    Students.Add(student);
-                }
+                var students = (string)query["students"];
+                Students.LoadAfterEdit(students);
             }
         }
     }

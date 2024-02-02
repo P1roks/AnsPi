@@ -20,5 +20,11 @@ namespace AnsPi
 
             return hash;
         }
+
+        public static uint GetLuckyNumber() =>
+            uint.Parse(File.ReadAllText(Path.Combine(FileSystem.AppDataDirectory, "luckynumber")));
+
+        public static void SetLuckyNumber(uint newLucky) =>
+            File.WriteAllText(Path.Combine(FileSystem.AppDataDirectory, "luckynumber"), newLucky.ToString());
     }
 }
