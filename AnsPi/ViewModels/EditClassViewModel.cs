@@ -25,9 +25,22 @@ namespace AnsPi.ViewModels
 
         private async Task Save()
         {
+            var lines = Input.Split('\r');
+            List<Models.Student> students = new(lines.Length);
+            foreach(var line in lines)
+            {
+                try
+                {
+                    students.Add(new Models.Student(line));
+                }
+                catch
+                {
+                    continue; 
+                }
+            }
             Dictionary<string, object> navi = new()
             {
-                {"students", from line in Input.Split('\r') select new Models.Person(line)}
+                {"students", students}
             };
             await Shell.Current.GoToAsync("..", navi);
         }

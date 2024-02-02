@@ -1,13 +1,14 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Windows.Input;
 
 namespace AnsPi.ViewModels
 {
     public class ClassViewModel : IQueryAttributable
     {
-        public ObservableCollection<Models.Person> Students { get; private set; } = new();
-        private int[] lastRolled = new int[3] { 0, 0, 0 };
+        public ObservableCollection<Models.Student> Students { get; private set; } = new();
+        private ulong[] lastRolled = new ulong[3] { 0, 0, 0 };
         private uint luckyNumber = 0;
         private string selectedClass = "";
 
@@ -91,17 +92,19 @@ namespace AnsPi.ViewModels
         {
             if (!await CheckClass()) return;
 
+            Trace.WriteLine(Students[0].GetHashCode());
+
             var valid = Students.Where
                 (student => student.Number != luckyNumber &&
-                student.Present && !lastRolled.Contains(student.GetHashCode()));
+                student.Present && !lastRolled.Contains(student.GetDeterministicHashCode()));
             int chosen = new Random().Next(valid.Count());
             var chosenStudent = valid.ElementAt(chosen);
 
             await Shell.Current.DisplayAlert("Roll", $"{chosenStudent} has been selected for answer!", "OK");
-            UpdateLastRolled(chosenStudent.GetHashCode());
+            UpdateLastRolled(chosenStudent.GetDeterministicHashCode());
         }
 
-        private void UpdateLastRolled(int inserted)
+        private void UpdateLastRolled(ulong inserted)
         {
             lastRolled[0] = lastRolled[1];
             lastRolled[1] = lastRolled[2];
@@ -113,7 +116,7 @@ namespace AnsPi.ViewModels
             if(query.ContainsKey("students"))
             {
                 Students.Clear();
-                var students = (IEnumerable<Models.Person>)query["students"];
+                var students = (IEnumerable<Models.Student>)query["students"];
                 foreach(var student in students)
                 {
                     Students.Add(student);

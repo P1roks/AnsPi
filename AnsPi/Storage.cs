@@ -15,18 +15,18 @@ namespace AnsPi
             .Select(Path.GetFileNameWithoutExtension)
             .ToArray();
 
-        public static IEnumerable<Person> GetStudents(string className)
+        public static IEnumerable<Student> GetStudents(string className)
         {
             string fileName = Path.ChangeExtension(className, ".txt");
             string filePath = Path.Combine(FileSystem.AppDataDirectory, fileName);
             if(File.Exists(filePath))
             {
                 var lines = File.ReadLines(filePath);
-                return from line in lines select new Person(line);
+                return from line in lines select new Student(line);
             }
             else
             {
-                return Enumerable.Empty<Person>();
+                return Enumerable.Empty<Student>();
             }
         }
 

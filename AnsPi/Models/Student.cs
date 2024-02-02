@@ -7,30 +7,35 @@ using System.Threading.Tasks;
 
 namespace AnsPi.Models
 {
-    public class Person
+    public class Student
     {
         public string FullName { get => ToString(); }
         public uint Number => _number;
-        public bool Present => _present;
+        public bool Present {
+            get => _present;
+            set => _present = value;
+        }
 
         uint _number;
         string name;
         string surname;
         bool _present = true;
 
-        public Person(string line)
+        public Student(string line)
         {
             string[] split = line.Split(' ');
+            if (split.Length != 3)
+                throw new ArgumentException("Provided line is not a valid student representation!");
             _number = uint.Parse(split[0]);
             name = split[1];
             surname = split[2];
         }
 
-        public override int GetHashCode()
+        public ulong GetDeterministicHashCode()
         {
-            int res = _number.GetHashCode();
-            res = (res * 397) ^ name.GetHashCode();
-            res = (res * 397) ^ surname.GetHashCode();
+            ulong res = _number;
+            res = (res * 397) ^ Utils.GetStringHash(name);
+            res = (res * 397) ^ Utils.GetStringHash(surname);
             return res;
         }
 
