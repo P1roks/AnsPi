@@ -3,16 +3,16 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:AnsPi.ViewModels"
              x:Class="AnsPi.Views.EditClassPage"
-             Title="EditClassPage">
+             Title="Edit Class">
     <ContentPage.BindingContext>
         <viewmodels:EditClassViewModel />
     </ContentPage.BindingContext>
 
-    <VerticalStackLayout>
-        <Editor HeightRequest="500" Placeholder="1 Jan Nowak" Text="{Binding Input}" />
-        <HorizontalStackLayout>
+    <FlexLayout x:Name="editor">
+        <Editor Text="{Binding Input}" StyleClass="student-editor" />
+        <FlexLayout StyleClass="editor-buttons">
             <Button Text="Save" Command="{Binding SaveCommand}" />
             <Button Text="Cancel" Command="{Binding CancelCommand}" />
-        </HorizontalStackLayout>
-    </VerticalStackLayout>
+        </FlexLayout>
+    </FlexLayout>
 </ContentPage>

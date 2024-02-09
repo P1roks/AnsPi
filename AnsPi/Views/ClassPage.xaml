@@ -4,7 +4,7 @@
              xmlns:models="clr-namespace:AnsPi.Models"
              xmlns:viewmodels="clr-namespace:AnsPi.ViewModels"
              x:Class="AnsPi.Views.ClassPage"
-             Title="ClassPage">
+             Title="Classes">
     <ContentPage.BindingContext>
         <viewmodels:ClassViewModel />
     </ContentPage.BindingContext>
@@ -20,19 +20,23 @@
     </ContentPage.ToolbarItems>
 
 
-    <StackLayout Orientation="Vertical">
-        <ListView ItemsSource="{Binding Students}" SelectionMode="None">
-            <ListView.ItemTemplate>
+    <FlexLayout x:Name="students">
+        <Label StyleClass="students-title" Text="Students"/>
+        <CollectionView ItemsSource="{Binding Students}" SelectionMode="None" ItemsLayout="VerticalGrid, 3">
+            <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <ViewCell>
-                        <StackLayout Orientation="Horizontal">
-                            <Label Text="{Binding FullName}" />
-                            <CheckBox IsChecked="{Binding Present}" />
-                        </StackLayout>
-                    </ViewCell>
+                    <Grid StyleClass="student-cell">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Label Text="{Binding FullName}" Grid.Column="0" />
+                        <CheckBox IsChecked="{Binding Present}" Grid.Column="1" />
+                    </Grid>
                 </DataTemplate>        
-            </ListView.ItemTemplate> 
-        </ListView>
+            </CollectionView.ItemTemplate> 
+        </CollectionView>
         <Button Text="Roll" Command="{Binding RollCommand}" />
-    </StackLayout>
+    </FlexLayout>
 </ContentPage>
