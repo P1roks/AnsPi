@@ -1,13 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System.Windows.Input;
 
 namespace AnsPi.ViewModels
 {
     public partial class EditClassViewModel : ObservableObject, IQueryAttributable 
     {
-        public ICommand SaveCommand { get; set; }
-        public ICommand CancelCommand { get; set; }
         public string Input
         {
             get => _input;
@@ -19,10 +16,9 @@ namespace AnsPi.ViewModels
         public EditClassViewModel() 
         {
             Input = null; 
-            SaveCommand = new AsyncRelayCommand(Save);
-            CancelCommand = new AsyncRelayCommand(Cancel);
         }
 
+        [RelayCommand]
         private async Task Save()
         {
             Dictionary<string, object> navi = new()
@@ -32,6 +28,7 @@ namespace AnsPi.ViewModels
             await Shell.Current.GoToAsync("..", navi);
         }
 
+        [RelayCommand]
         private async Task Cancel()
         {
             await Shell.Current.GoToAsync("..");

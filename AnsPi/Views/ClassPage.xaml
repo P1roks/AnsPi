@@ -16,7 +16,7 @@
         <ToolbarItem IconImageSource="{FontImage Glyph={x:Static models:Icons.EditIcon}, FontFamily='MaterialIcons'}"
                      Text="Edit Class" Command="{Binding EditClassCommand}" />
         <ToolbarItem IconImageSource="{FontImage Glyph={x:Static models:Icons.CloverIcon}, FontFamily='NerdIcons'}"
-                     Text="Lucky Number" Command="{Binding LuckyNumberCommand}" />
+                     Text="Lucky Number" Command="{Binding ChangeLuckyNumberCommand}" />
     </ContentPage.ToolbarItems>
 
 
@@ -37,6 +37,6 @@
                 </DataTemplate>        
             </CollectionView.ItemTemplate> 
         </CollectionView>
-        <Button Text="Roll" Command="{Binding RollCommand}" />
+        <Button Text="Roll" Command="{Binding RollStudentCommand}" />
     </FlexLayout>
 </ContentPage>

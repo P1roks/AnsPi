@@ -1,27 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.Input;
-using System.Diagnostics;
-using System.Windows.Input;
 
 namespace AnsPi.ViewModels
 {
-    public class ClassViewModel : IQueryAttributable
+    public partial class ClassViewModel : IQueryAttributable
     {
         public Models.StudentsHandler Students { get; private set; } = new();
         private uint luckyNumber = Utils.GetLuckyNumber();
-
-        public ICommand ChangeClassCommand { get; set; }
-        public ICommand AddClassCommand { get; set; }
-        public ICommand EditClassCommand { get; set; }
-        public ICommand LuckyNumberCommand { get; set; }
-        public ICommand RollCommand { get; set; }
-
-        public ClassViewModel() {
-            ChangeClassCommand = new AsyncRelayCommand(ChangeClass);
-            AddClassCommand = new AsyncRelayCommand(AddClass);
-            EditClassCommand = new AsyncRelayCommand(EditClass);
-            LuckyNumberCommand = new AsyncRelayCommand(ChangeLuckyNumber);
-            RollCommand = new AsyncRelayCommand(RollStudent);
-        }
 
         private async Task<bool> CheckClass()
         {
@@ -33,6 +17,7 @@ namespace AnsPi.ViewModels
             return true; 
         }
 
+        [RelayCommand]
         private async Task ChangeClass()
         {
             string[] classes = Models.StudentsHandler.GetClasses();
@@ -42,6 +27,7 @@ namespace AnsPi.ViewModels
             Students.ChangeClass(selected);
         }
 
+        [RelayCommand]
         private async Task AddClass()
         {
             string className = await Shell.Current.DisplayPromptAsync("Add Class", "Enter new class name: ");
@@ -58,6 +44,7 @@ namespace AnsPi.ViewModels
             }
         }
 
+        [RelayCommand]
         private async Task EditClass()
         {
             if (!await CheckClass()) return;
@@ -68,6 +55,7 @@ namespace AnsPi.ViewModels
             await Shell.Current.GoToAsync(nameof(Views.EditClassPage), input);
         }
 
+        [RelayCommand]
         private async Task ChangeLuckyNumber()
         {
             if (!await CheckClass()) return;
@@ -88,6 +76,7 @@ namespace AnsPi.ViewModels
             Utils.SetLuckyNumber(luckyNumber);
         }
 
+        [RelayCommand]
         private async Task RollStudent()
         {
             if (!await CheckClass()) return;
